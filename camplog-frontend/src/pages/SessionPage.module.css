@@ -1,0 +1,236 @@
+.scene {
+  position: relative;
+  min-height: calc(100vh - 52px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 뒤로가기 버튼 — 네브바 로고 아래 고정 */
+.backBtn {
+  position: fixed;
+  top: 62px;
+  left: 16px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 7px 14px 7px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.2s;
+}
+
+.backBtn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.skyLayer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 3s ease-in-out;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  object-fit: contain;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cloud {
+  position: absolute;
+  z-index: 1;
+  opacity: 0.85;
+  animation: cloudMove linear infinite;
+  pointer-events: none;
+}
+
+@keyframes cloudMove {
+  from { transform: translateX(-70em); }
+  to   { transform: translateX(190vw); }
+}
+
+.tree {
+  position: absolute;
+  bottom: 80px;
+  object-fit: contain;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(to bottom, #1a1208, #0d0a04);
+  z-index: 3;
+  border-radius: 50% 50% 0 0 / 30px 30px 0 0;
+}
+
+.glow {
+  position: absolute;
+  bottom: 55px;
+  left: 28%;
+  transform: translateX(-50%);
+  width: 420px;
+  height: 230px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 70%,
+    rgba(255, 140, 30, 0.6) 0%,
+    rgba(255, 100, 10, 0.3) 35%,
+    rgba(255, 60, 0, 0.1) 65%,
+    transparent 100%
+  );
+  filter: blur(28px);
+  mix-blend-mode: screen;
+  z-index: 8;
+  animation: glowPulse 2.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes glowPulse {
+  0%   { opacity: 0.8; transform: translateX(-50%) scaleX(1); }
+  100% { opacity: 1;   transform: translateX(-50%) scaleX(1.05); }
+}
+
+.campfireWrap {
+  position: absolute;
+  bottom: 80px;
+  left: 28%;
+  transform: translateX(-50%) scale(2);
+  transform-origin: bottom center;
+  z-index: 4;
+}
+
+
+/* 타이머 오버레이 */
+.timerOverlay {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 100px;
+}
+
+.sessionLabel {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.35);
+  padding: 4px 18px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.timerRing {
+  position: relative;
+  width: 460px;
+  height: 460px;
+}
+
+.timerDisplay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.timerTime {
+  font-size: 100px;
+  font-weight: 700;
+  color: white;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+.accumulated {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 10px;
+}
+
+.accumulated strong {
+  color: #ff5722;
+  font-weight: 600;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.pauseBtn {
+  color: white;
+  padding: 10px 30px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  transition: background 0.2s, border-color 0.2s;
+  background-color: rgba(1,1,1,0.75);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.pauseBtn:hover {
+  background: rgba(50, 50, 50, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.endBtn {
+  background: transparent;
+  border: none;
+  padding: 10px 30px;
+  color: rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: color 0.2s;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  background-color: rgba(1,1,1, 0.75);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.endBtn:hover {
+  background: rgba(50, 50, 50, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.muteBtn {
+  background: rgba(1, 1, 1, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  transition: background 0.2s;
+}
+
+.muteBtn:hover {
+  background: rgba(50, 50, 50, 0.85);
+}

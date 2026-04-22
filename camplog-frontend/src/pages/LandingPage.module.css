@@ -1,0 +1,239 @@
+.scene {
+  position: relative;
+  min-height: 98vh;
+  overflow: hidden;
+  background: #0d0e2a; /* 기본값 — JS로 override됨 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 배경 레이어 — crossfade용 */
+.skyLayer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 3s ease-in-out;
+  z-index: 0;
+}
+
+/* 구름 */
+.cloud {
+  position: absolute;
+  z-index: 1;
+  opacity: 0.85;
+  animation: cloudMove linear infinite;
+  pointer-events: none;
+}
+
+@keyframes cloudMove {
+  from { transform: translateX(-70em); }
+  to   { transform: translateX(190vw); }
+}
+
+/* 별 */
+.star {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* 땅 */
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, #1a1208, #0d0a04);
+  z-index: 3;
+}
+
+/* 나무 */
+.tree {
+  position: absolute;
+  bottom: 80px; /* footer 높이만큼 */
+  object-fit: contain;
+  z-index: 2;
+}
+
+/* 돌 */
+.stone {
+  position: absolute;
+  bottom: 80px;
+  object-fit: contain;
+  z-index: 2;
+}
+
+/* 오른쪽 돌 + 랜턴 묶음 — 위치는 여기서만 결정 */
+.stoneWithLantern {
+  position: absolute;
+  bottom: 80px;
+  right: 22%;
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.stoneInner {
+  width: 160px;
+  object-fit: contain;
+}
+
+/* 캠프파이어 */
+.campfireWrap {
+  position: absolute;
+  bottom: 80px; /* footer 높이 위로 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 텐트 */
+.tent {
+  position: absolute;
+  bottom: 75px; /* footer 높이 위로 */
+  left: 30%;
+  transform: translateX(-50%);
+  z-index: 4;
+  width: 350px;
+  object-fit: contain;
+}
+
+/* 랜턴 wrapper — stoneWithLantern 기준 돌 위 중앙 */
+.lanternWrap {
+  position: absolute;
+  bottom: 100%;
+  left: 38%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* 랜턴 이미지 */
+.lanternImg {
+  position: relative;
+  width: 50px;
+  object-fit: contain;
+  z-index: 1;
+}
+
+/* 랜턴 불빛 glow — wrapper 기준 중앙 정렬 */
+.lanternGlow {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 60%,
+    rgba(255, 200, 60, 0.55) 0%,
+    rgba(255, 150, 20, 0.25) 45%,
+    transparent 100%
+  );
+  filter: blur(18px);
+  mix-blend-mode: screen;
+  z-index: 0;
+  animation: lanternPulse 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes lanternPulse {
+  0%   { opacity: 0.7; transform: translateX(-50%) scale(1); }
+  100% { opacity: 1;   transform: translateX(-50%) scale(1.08); }
+}
+
+/* 불빛 glow — footer(z-index:3) 아래에 있어야 땅 위로 안 보임 */
+.glow {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 520px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 70%,
+    rgba(255, 140, 30, 0.6) 0%,
+    rgba(255, 100, 10, 0.3) 35%,
+    rgba(255, 60, 0, 0.1) 65%,
+    transparent 100%
+  );
+  filter: blur(24px);
+  mix-blend-mode: screen;
+  z-index: 2;
+  animation: glowPulse 2.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+
+/* 불꽃 crossfade — 0.7~1 사이로만 움직여서 끊기는 순간 완전 커버 */
+@keyframes fireBlend {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+@keyframes glowPulse {
+  0%   { opacity: 0.8; transform: translateX(-50%) scaleX(1)    scaleY(1); }
+  100% { opacity: 1;   transform: translateX(-50%) scaleX(1.06) scaleY(1.04); }
+}
+
+/* 텍스트 */
+.content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 0 1rem;
+  margin-bottom: 160px;
+}
+/* 제목 */
+.title {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 1rem;
+  margin-top: 1em;
+}
+
+/* 설명 */
+.description {
+  font-size: 1.25rem;
+  color: #94a3b8;
+  margin-bottom: 2rem;
+}
+
+/* CTA 버튼 */
+.ctaButton{
+  background-color: #ff5722;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding: 1em 2.8em;
+  border-radius: 0.6em;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+}
+
+.ctaButton:hover {
+  background-color: #e34d1f;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.5rem;
+  }
+  .description {
+    font-size: 1rem;
+  }
+  .ctaButton {
+    padding: 0.8em 2em;
+  }
+}

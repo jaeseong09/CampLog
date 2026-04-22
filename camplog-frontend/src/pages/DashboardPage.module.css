@@ -1,0 +1,454 @@
+.dashboard{
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  transition: background 3s ease;
+  padding: 2.5% 7.5%;
+}
+
+.header {
+  position: relative;
+  width: 100%;
+  height: 330px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid #C9C9C9;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 배경 레이어 — crossfade용 */
+.headerSkyLayer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 3s ease-in-out;
+  z-index: 0;
+}
+
+/* 씬 콘텐츠 영역 — 나무, 캠프파이어 등 배치용 */
+.headerScene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.headerStar {
+  position: absolute;
+  object-fit: contain;
+}
+
+.headerCloud {
+  position: absolute;
+  z-index: 1;
+  opacity: 0.85;
+  animation: headerCloudMove linear infinite;
+  pointer-events: none;
+}
+
+@keyframes headerCloudMove {
+  from { transform: translateX(-30em); }
+  to   { transform: translateX(120vw); }
+}
+
+/* headerFooter(75px) 바로 위에 정렬 */
+.headerTree {
+  position: absolute;
+  bottom: 75px;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.contentList {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  flex-grow: 1;
+  height: 340px;
+  margin-bottom: 0;
+  max-height: 340px;
+  margin-bottom: 20px;
+}
+
+.contentItem{
+  background-color: aliceblue;
+  flex: 1;
+  border-radius: 20px;
+  border: none;
+  color: white;
+  background-color: #1B1B1B;
+  height: 340px;
+  border: 2px solid #C9C9C9;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 이번 주 차트 */
+.weeklyChart {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 20px 16px;
+  min-height: 0;
+}
+
+.weeklyBars {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex: 1;
+  gap: 6px;
+  min-height: 0;
+}
+
+.weeklyBarCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  gap: 8px;
+}
+
+.weeklyBarTrack {
+  flex: 1;
+  width: 80%;
+  background: #2a2a2a;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.weeklyBarFill {
+  width: 100%;
+  background: #d0d0d0;
+  border-radius: 6px;
+  transition: height 0.6s ease;
+}
+
+.weeklyBarToday {
+  background: #ff5722;
+}
+
+.weeklyDayLabel {
+  font-size: 11px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.weeklyDayToday {
+  color: white;
+  font-weight: bold;
+}
+
+.weeklyTotal {
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  padding-top: 14px;
+  flex-shrink: 0;
+}
+
+.weeklyTotal strong {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* 캠프 성장 마일스톤 */
+.milestoneList {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 16px 16px;
+  flex: 1;
+  overflow-y: auto;
+  height:100%;
+}
+
+.milestoneItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+  height: 100%;
+}
+
+/* 왼쪽 타임라인 열 */
+.milestoneLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  align-self: stretch;
+}
+
+/* 상태 원 */
+.milestoneDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.milestoneDotDone      { background: #22c55e; color: white; }
+.milestoneDotProgress  { background: #ff5722; }
+.milestoneDotLocked    { background: #3a3a3a; }
+
+/* 연결선 */
+.milestoneLine {
+  width: 2px;
+  flex: 1;
+  min-height: 10px;
+  background: #3a3a3a;
+  margin: 3px 0;
+}
+
+/* 오른쪽 콘텐츠 */
+.milestoneContent {
+  flex: 1;
+  padding-bottom: 12px;
+}
+
+.milestoneRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.milestoneIcon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.milestoneLabel {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.milestoneLabelDone     { color: white; }
+.milestoneLabelProgress { color: white; }
+.milestoneLabelLocked   { color: #555; }
+
+.milestoneDesc {
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.milestoneDescDone     { color: #22c55e; }
+.milestoneDescProgress { color: #ff5722; }
+.milestoneDescLocked   { color: #555; }
+
+/* 진행 바 */
+.milestoneProgressBar {
+  margin-top: 6px;
+  height: 8px;
+  background: #2a2a2a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.milestoneProgressFill {
+  height: 100%;
+  background: #ff5722;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.newSessionButton{
+  padding: 15px;
+  background-color: #ff5722;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  height: 60px;
+}
+
+.headerFooter{
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 75px;
+  margin-top: auto;
+  background: #1B1B1B;
+}
+
+.headerTitle{
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  padding-left: 20px;
+  padding-top: 20px;
+}
+
+/* 왼쪽 돌 */
+.stone {
+  position: absolute;
+  bottom: 75px;
+  left: 20%;
+  width: 100px;
+  z-index: 5;
+}
+
+/* 오른쪽 돌 + 랜턴 — 이 div가 앵커 */
+.stoneWithLantern {
+  position: absolute;
+  bottom: 75px;
+  right: 30%;
+  z-index: 5;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* 돌 이미지 */
+.stoneInner {
+  width: 100px;
+  object-fit: contain;
+}
+
+/* 랜턴 — 돌 위 중앙에 위치 */
+.lanternWrap {
+  position: absolute;
+  bottom: 100%;
+  left: 40%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* 랜턴 이미지 */
+.lanternImg {
+  position: relative;
+  width: 35px;
+  object-fit: contain;
+  z-index: 1;
+}
+
+/* 랜턴 글로우 */
+.lanternGlow {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 60%,
+    rgba(255, 200, 60, 0.55) 0%,
+    rgba(255, 150, 20, 0.25) 45%,
+    transparent 100%
+  );
+  filter: blur(18px);
+  mix-blend-mode: screen;
+  z-index: 0;
+  animation: lanternPulse 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes lanternPulse {
+  0%   { opacity: 0.7; transform: translateX(-50%) scale(1); }
+  100% { opacity: 1;   transform: translateX(-50%) scale(1.08); }
+}
+
+.tent{
+  position: absolute;
+  bottom: 72px;
+  left: 37.5%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: 200px;
+  object-fit: contain;
+}
+
+.bearWrap {
+  position: absolute;
+  bottom: 30px;
+  left: calc(60%);
+  transform: translateX(-60%) scale(0.6);
+  transform-origin: bottom center;
+  z-index: 5;
+}
+
+.campfireWrap{
+  position: absolute;
+  bottom: 75px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.65);
+  transform-origin: bottom center;
+  z-index: 5;
+}
+
+.glow{
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 72%,
+    rgba(255, 145, 30, 0.70) 0%,
+    rgba(255, 100, 10, 0.38) 38%,
+    rgba(255, 60,  0, 0.12) 65%,
+    transparent 100%
+  );
+  filter: blur(32px);
+  mix-blend-mode: screen;
+  z-index: 4;
+  animation: glowPulse 2.4s ease-in-out infinite alternate;
+}
+
+.contentTitle{
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 25px;
+}
+
+.contentSubtitle{
+  color: #5A5A5A;
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 0px;
+  margin-top: 25px;
+}
+
+.contentData{
+  color: white;
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+  padding: 0 10px;
+  margin-top: 0px;
+}
+
+.underline{
+  width: 80%;
+  height: 2px;
+  background-color: #5A5A5A;
+  margin: 40px auto 0 auto;
+}
+
+.sessionText{
+  color: #5A5A5A;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+span{
+  color: white;
+  font-weight: bold;
+}

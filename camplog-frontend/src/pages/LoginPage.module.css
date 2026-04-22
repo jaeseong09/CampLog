@@ -1,0 +1,265 @@
+/* 씬 전체 */
+.scene {
+  position: relative;
+  min-height: calc(100vh - 3.25rem);
+  overflow: hidden;
+  background: #0d0e2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 배경 레이어 — crossfade */
+.skyLayer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 3s ease-in-out;
+  z-index: 0;
+}
+
+/* 별 */
+.star {
+  position: absolute;
+  object-fit: contain;
+  z-index: 1;
+}
+
+/* 나무 */
+.tree {
+  position: absolute;
+  bottom: 74px; /* footer 높이보다 살짝 낮게 — 뿌리가 땅에 묻힌 느낌 */
+  object-fit: contain;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 캠프파이어 — 1.5배 확대 */
+.campfireWrap {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) scale(1.5);
+  transform-origin: bottom center;
+  z-index: 6;
+}
+
+/* 불빛 glow — 앞쪽 레이어, 나무보다 앞 */
+.glow {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 760px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 72%,
+    rgba(255, 145, 30, 0.70) 0%,
+    rgba(255, 100, 10, 0.38) 38%,
+    rgba(255, 60,  0, 0.12) 65%,
+    transparent 100%
+  );
+  filter: blur(32px);
+  mix-blend-mode: screen;
+  z-index: 5; /* 나무(2)·파이어(3)보다 앞 — 앞에서 타오르는 느낌 */
+  animation: glowPulse 2.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes glowPulse {
+  0%   { opacity: 0.82; transform: translateX(-50%) scaleX(1)    scaleY(1); }
+  100% { opacity: 1;    transform: translateX(-50%) scaleX(1.08) scaleY(1.05); }
+}
+
+/* 땅 — 위쪽을 둥글게 */
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: -4%;        /* 좌우로 살짝 넘쳐서 border-radius가 자연스럽게 */
+  right: -4%;
+  height: 88px;
+  background: linear-gradient(to bottom, #1c1408, #0d0a04);
+  border-radius: 60% 60% 0 0 / 26px 26px 0 0; /* 위쪽만 타원형으로 */
+  z-index: 4;
+}
+
+/* 카드 */
+.card {
+  position: relative;
+  z-index: 10;
+  background-color: rgba(15, 24, 41, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 36px 40px;
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 88px; /* footer 높이 */
+  z-index: 20;
+}
+
+/* 로고 */
+.logoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+/* 탭 바 */
+.tabBar {
+  position: relative;
+  display: flex;
+  margin-top: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.tabActive {
+  color: #e8924a;
+}
+
+/* 슬라이딩 언더라인 */
+.tabIndicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(to right, #c8622a, #e8924a);
+  transition: transform 0.3s ease;
+}
+
+/* 폼 높이 애니메이션 컨테이너 */
+.formAnimator {
+  position: relative;
+  overflow: hidden;
+  transition: height 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 각 폼 패널 — fade + 살짝 위아래 이동 */
+.formPane {
+  width: 100%;
+  transition:
+    opacity   0.3s ease,
+    transform 0.3s ease;
+}
+
+/* 폼 */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.input {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.input:focus {
+  border-color: rgba(232, 146, 74, 0.5);
+}
+
+/* 제출 버튼 */
+.submitButton {
+  padding: 13px;
+  background: linear-gradient(to right, #fd570a, #ff821b);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  letter-spacing: 0.02em;
+  margin-top: 12px;
+}
+
+.submitButton:hover {
+  opacity: 0.88;
+}
+
+/* 구분선 */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.8rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* 구글 버튼 */
+.googleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.googleButton:hover {
+  background: rgba(255, 255, 255, 0.13);
+}

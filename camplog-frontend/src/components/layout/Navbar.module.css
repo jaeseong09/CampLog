@@ -1,0 +1,44 @@
+.navbar{
+  background-color: #0a0806;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo{
+  width: 3em;
+  margin-left: 0.5em;
+}
+
+.flexDiv{
+  display: flex;
+  gap: 1em;
+}
+
+.logoImg{
+  width: 80%;
+}
+
+.logo-text{
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.signup-link{
+  color: #808080;
+}
+
+.muteBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 4px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.muteBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+

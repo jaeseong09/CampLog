@@ -1,0 +1,109 @@
+.wrapper {
+  position: relative;
+  width: 140px;
+  height: 180px;
+}
+
+/* ── 장작 ── */
+.logGroup {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 40px;
+}
+
+.log {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 130px;
+  height: 22px;
+  background: linear-gradient(to bottom, #C8864A, #A0622A);
+  border-radius: 11px;
+  border: 2.5px solid #3D1F06;
+}
+.log1 { transform: translateX(-50%) rotate(-20deg); }
+.log2 { transform: translateX(-50%) rotate(20deg); }
+
+/* 통나무 끝 원형 캡 */
+.logCap {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #B0702E;
+  border: 2.5px solid #3D1F06;
+  bottom: 8px;
+}
+.cap1 { left: -2px;  transform: translateY(7px) rotate(-20deg); background: #9A5C22; }
+.cap2 { right: -2px; transform: translateY(7px) rotate(-20deg); background: #9A5C22; }
+.cap3 { left: -2px;  transform: translateY(-7px) rotate(20deg); background: #9A5C22; }
+.cap4 { right: -2px; transform: translateY(-7px) rotate(20deg); background: #9A5C22; }
+
+/* ── 불꽃 ── */
+.flameGroup {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 130px;
+}
+
+/* 바깥 주황 불꽃 */
+.flameOuter {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 72px;
+  height: 115px;
+  background: linear-gradient(to top, #FF4D00 0%, #FF7A00 50%, #FFAA00 100%);
+  border-radius: 50% 50% 30% 30%;
+  transform-origin: 50% 100%;
+  animation: sway 1.3s ease-in-out infinite alternate;
+}
+
+/* 안쪽 노란 불꽃 */
+.flameInner {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 72px;
+  background: linear-gradient(to top, #FFB800 0%, #FFE84D 60%, #FFF8A0 100%);
+  border-radius: 50% 50% 30% 30%;
+  transform-origin: 50% 100%;
+  animation: sway2 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes sway {
+  0%   { transform: translateX(-50%) rotate(-3deg) scaleX(1.00); }
+  100% { transform: translateX(-50%) rotate( 3deg) scaleX(0.94); }
+}
+@keyframes sway2 {
+  0%   { transform: translateX(-50%) rotate( 4deg) scaleX(0.92); }
+  100% { transform: translateX(-50%) rotate(-4deg) scaleX(1.05); }
+}
+
+/* ── 불씨 ── */
+.spark {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #FF8C00;
+  opacity: 0;
+  animation: sparkUp linear infinite;
+}
+.spark:nth-child(1) { left: 30%; bottom: 120px; animation-duration: 1.2s; animation-delay: 0.0s; background: #FFD700; }
+.spark:nth-child(2) { left: 60%; bottom: 110px; animation-duration: 1.6s; animation-delay: 0.5s; background: #FF8C00; width:4px; height:4px; }
+.spark:nth-child(3) { left: 48%; bottom: 125px; animation-duration: 1.4s; animation-delay: 1.0s; background: #FFB800; width:3px; height:3px; }
+
+@keyframes sparkUp {
+  0%   { opacity: 1;   transform: translateY(0)     translateX(0); }
+  100% { opacity: 0;   transform: translateY(-55px) translateX(8px); }
+}
