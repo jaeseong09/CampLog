@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import styles from './LandingPage.module.css'
+import { useAuthStore } from '../store/authStore'
 import Campfire from '../components/scene/Campfire'
 import Bear from '../components/scene/Bear'
 import SkyBody from '../components/scene/SkyBody'
@@ -20,6 +21,7 @@ const STARS = [
 
 export default function LandingPage() {
   const { theme, prevTheme, fading } = useTimeOfDay()
+  const { isAuthenticated } = useAuthStore()
 
   return (
     <div className={styles.scene}>
@@ -113,7 +115,7 @@ export default function LandingPage() {
       <div className={styles.content}>
         <h1 className={styles.title}>공부할 때마다, 나만의 캠프가 피어난다</h1>
         <p className={styles.description} style={theme.period === 'day' ? { color: 'white' } : {}}>집중한 시간이 쌓일수록 텐트가 생기고, 동물이 찾아오고, 캠프가 완성됩니다</p>
-        <Link to="/login" className={styles.ctaButton}>
+        <Link to={isAuthenticated ? '/dashboard' : '/login'} className={styles.ctaButton}>
           지금 캠프 시작하기
         </Link>
       </div>

@@ -1,10 +1,25 @@
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import styles from './DashboardPage.module.css'
 import { useTimeOfDay } from '../hooks/useTimeOfDay'
 import { useTimerStore } from '../store/timerStore'
+import { useAuthStore } from '../store/authStore'
+import { sessionsApi } from '../api/sessions'
+import { campsiteApi } from '../api/campsite'
+import type { CampsiteResponse, SessionResponse } from '../types'
 import SkyBody from '../components/scene/SkyBody'
 import Campfire from '../components/scene/Campfire'
 import Bear from '../components/scene/Bear'
+
+const DAYS_LABEL = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+const MILESTONE_CONFIG = [
+  { key: 'tent',          icon: '⛺', label: '텐트',          threshold: 60  },
+  { key: 'lantern',       icon: '🏮', label: '랜턴',          threshold: 180 },
+  { key: 'squirrel',      icon: '🐿️', label: '다람쥐',        threshold: 300 },
+  { key: 'pigeon_nest',   icon: '🕊️', label: '비둘기 둥지',   threshold: 480 },
+  { key: 'constellation', icon: '✨', label: '별자리 표지판', threshold: 900 },
+]
 
 const STARS = [
   { top: '12%', left: '10%', size: 14 },
@@ -14,28 +29,56 @@ const STARS = [
   { top: '20%', left: '85%', size: 10 },
 ]
 
-const MILESTONES = [
-  { icon: '⛺', label: '텐트',           status: 'done',       desc: '1h 달성',    progress: 100 },
-  { icon: '🏮', label: '랜턴',           status: 'inProgress', desc: '진행 중 60%', progress: 60  },
-  { icon: '🐿️', label: '다람쥐',         status: 'locked',     desc: '5h~',        progress: 0   },
-  { icon: '🔥', label: '모닥불 업그레이드', status: 'locked',     desc: '10h~',       progress: 0   },
-] as const
+function buildWeeklyData(sessions: SessionResponse[]): number[] {
+  const totals = Array(7).fill(0)
+  const now = Date.now()
+  sessions.forEach((s) => {
+    if (s.duration == null || s.endedAt == null) return  // 진행중 세션 제외
+    const diffMs = now - new Date(s.startedAt).getTime()
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    if (diffDays >= 0 && diffDays < 7) {
+      totals[6 - diffDays] += s.duration
+    }
+  })
+  return totals
+}
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-// 더미 데이터 (분 단위) — 추후 API로 교체
-const WEEKLY_DATA = [120, 90, 180, 60, 45, 150, 30]
-
-
-const maxTime = Math.max(...WEEKLY_DATA)
-const maxIndex = WEEKLY_DATA.indexOf(maxTime)
-const totalMinutes = WEEKLY_DATA.reduce((a, b) => a + b, 0)
-const totalHours = Math.floor(totalMinutes / 60)
-const totalMins = totalMinutes % 60
+function getWeeklyLabels(): string[] {
+  const labels: string[] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    labels.push(DAYS_LABEL[d.getDay() === 0 ? 6 : d.getDay() - 1])
+  }
+  return labels
+}
 
 export default function DashboardPage() {
   const { theme, prevTheme, fading } = useTimeOfDay()
   const { start, isRunning, getElapsedSeconds } = useTimerStore()
+  const { user } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  const [campsite, setCampsite] = useState<CampsiteResponse | null>(null)
+  const [todaySessions, setTodaySessions] = useState<SessionResponse[]>([])
+  const [weeklySessions, setWeeklySessions] = useState<SessionResponse[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+    Promise.all([
+      campsiteApi.get(),
+      sessionsApi.today(),
+      sessionsApi.weekly(),
+    ]).then(([c, t, w]) => {
+      setCampsite(c.data)
+      setTodaySessions(t.data)
+      setWeeklySessions(w.data)
+    }).catch((err) => {
+      console.error('Dashboard fetch error:', err?.response?.status, err?.response?.data || err?.message)
+    }).finally(() => setLoading(false))
+  }, [location.key])
 
   const hasActiveSession = isRunning || getElapsedSeconds() > 0
 
@@ -44,29 +87,50 @@ export default function DashboardPage() {
     navigate('/session')
   }
 
+  // 오늘 통계
+  const todayMinutes = todaySessions.reduce((sum, s) => sum + (s.duration ?? 0), 0)
+  const todayHours = Math.floor(todayMinutes / 60)
+  const todayMins = todayMinutes % 60
+  const todayCount = todaySessions.length
+  const avgFocus = todaySessions.length > 0
+    ? Math.round(todaySessions.reduce((sum, s) => sum + (s.focusScore ?? 0), 0) / todaySessions.length)
+    : 0
+
+  // 주간 차트
+  const weeklyData = buildWeeklyData(weeklySessions)
+  const weeklyLabels = getWeeklyLabels()
+  const maxTime = Math.max(...weeklyData, 1)
+  const maxIndex = weeklyData.indexOf(Math.max(...weeklyData))
+  const totalWeeklyMinutes = weeklyData.reduce((a, b) => a + b, 0)
+  const totalWeeklyHours = Math.floor(totalWeeklyMinutes / 60)
+  const totalWeeklyMins = totalWeeklyMinutes % 60
+
+  // 캠프 성장 마일스톤
+  const totalStudyTime = campsite?.totalStudyTime ?? user?.totalStudyTime ?? 0
+  const unlockedKeys = new Set(campsite?.unlockedItems.map((i) => i.itemType) ?? [])
+  const milestones = MILESTONE_CONFIG.map((m) => {
+    const done = unlockedKeys.has(m.key)
+    const inProgress = !done && totalStudyTime > 0 && totalStudyTime < m.threshold
+    const progress = done ? 100 : Math.min(99, Math.round((totalStudyTime / m.threshold) * 100))
+    return { ...m, status: done ? 'done' : inProgress ? 'inProgress' : 'locked', progress }
+  })
+
   return (
     <div className={styles.dashboard} style={{ background: theme.sky }}>
       <div className={styles.header}>
-
-        {/* 배경 레이어 — crossfade */}
         {prevTheme && (
           <div className={styles.headerSkyLayer} style={{ background: prevTheme.sky, opacity: fading ? 0 : 1 }} />
         )}
         <div className={styles.headerSkyLayer} style={{ background: theme.sky, opacity: 1 }} />
 
-        {/* 씬 콘텐츠 영역 */}
         <div className={styles.headerScene}>
-
-          {/* 해 / 달 */}
           <SkyBody showSun={theme.showSun} showMoon={theme.showMoon} />
 
-          {/* 별 */}
           {theme.showStars && STARS.map((s, i) => (
             <img key={i} src="/Star.png" alt="" className={styles.headerStar}
               style={{ top: s.top, left: s.left, width: s.size, height: s.size }} />
           ))}
 
-          {/* 구름 */}
           {theme.showClouds && <>
             <img src="/cloud.svg" alt="" className={styles.headerCloud} style={{ top: '10%', width: '140px', animationDuration: '80s', animationDelay: '0s' }} />
             <img src="/cloud.svg" alt="" className={styles.headerCloud} style={{ top: '10%', width: '140px', animationDuration: '80s', animationDelay: '-40s' }} />
@@ -74,20 +138,14 @@ export default function DashboardPage() {
             <img src="/cloud.svg" alt="" className={styles.headerCloud} style={{ top: '35%', width: '90px',  animationDuration: '110s', animationDelay: '-55s',  opacity: 0.6 }} />
           </>}
 
-          {/* 나무 왼쪽 */}
           <img src={theme.treeImage} alt="" className={styles.headerTree} style={{ left: '-15px', height: '220px' }} />
           <img src={theme.treeImage} alt="" className={styles.headerTree} style={{ left: '120px', height: '170px', opacity: 0.85 }} />
           <img src={theme.treeImage} alt="" className={styles.headerTree} style={{ left: '230px', height: '130px', opacity: 0.65 }} />
-
-          {/* 나무 오른쪽 */}
           <img src={theme.treeImage} alt="" className={styles.headerTree} style={{ right: '-15px', height: '220px' }} />
           <img src={theme.treeImage} alt="" className={styles.headerTree} style={{ right: '120px', height: '170px', opacity: 0.85 }} />
           <img src={theme.treeImage} alt="" className={styles.headerTree} style={{ right: '230px', height: '130px', opacity: 0.65 }} />
-          
-          {/* 돌 왼쪽 */}
-          <img src="/stone.png" alt="" className={styles.stone} />
 
-          {/* 돌 오른쪽 + 랜턴 (같은 위치에 고정) */}
+          <img src="/stone.png" alt="" className={styles.stone} />
           <div className={styles.stoneWithLantern}>
             <img src="/stone.png" alt="" className={styles.stoneInner} />
             <div className={styles.lanternWrap}>
@@ -96,53 +154,49 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* 텐트 */}
           <img src="/tent.png" alt="" className={styles.tent} />
-
-          {/* 곰 */}
-          <div className={styles.bearWrap}>
-            <Bear />
-          </div>
-
-          {/* 캠프파이어 */}
-          <div className={styles.campfireWrap}>
-            <Campfire />
-          </div>
-          
-          {/* 글로우 효과 (캠프파이어 빛) */}
+          <div className={styles.bearWrap}><Bear /></div>
+          <div className={styles.campfireWrap}><Campfire /></div>
           <div className={styles.glow} />
-
         </div>
 
-        {/* 하단 정보 바 */}
         <div className={styles.headerFooter}>
-          <h1 className={styles.headerTitle}>나의 캠프</h1>
+          <h1 className={styles.headerTitle}>{user?.nickname ?? '나'}의 캠프</h1>
         </div>
-
       </div>
+
       <div className={styles.contentList}>
+        {/* 오늘 공부 */}
         <div className={styles.contentItem}>
           <h1 className={styles.contentTitle}>오늘 공부</h1>
           <h2 className={styles.contentSubtitle}>오늘 집중한 시간</h2>
-          <p className={styles.contentData}>3시간&nbsp;&nbsp;&nbsp;20분</p>
+          {loading ? (
+            <p className={styles.contentData}>-</p>
+          ) : (
+            <p className={styles.contentData}>
+              {todayHours > 0 ? `${todayHours}시간` : ''}{todayMins > 0 ? `\u00a0\u00a0\u00a0${todayMins}분` : todayHours === 0 ? '0분' : ''}
+            </p>
+          )}
           <div className={styles.underline}></div>
           <div className={styles.sessionText}>
-            <p>집중도 &nbsp;<span>87%</span>&nbsp;&nbsp; | &nbsp;&nbsp;세션 &nbsp;<span>3회</span></p>
+            <p>집중도 &nbsp;<span>{loading ? '-' : `${avgFocus}%`}</span>&nbsp;&nbsp; | &nbsp;&nbsp;세션 &nbsp;<span>{loading ? '-' : `${todayCount}회`}</span></p>
           </div>
         </div>
+
+        {/* 이번 주 */}
         <div className={styles.contentItem}>
           <h1 className={styles.contentTitle}>이번 주</h1>
           <div className={styles.weeklyChart}>
             <div className={styles.weeklyBars}>
-              {DAYS.map((day, i) => {
-                const isMax = i === maxIndex
-                const heightPct = maxTime > 0 ? (WEEKLY_DATA[i] / maxTime) * 100 : 0
+              {weeklyLabels.map((day, i) => {
+                const isMax = i === maxIndex && weeklyData[i] > 0
+                const heightPct = (weeklyData[i] / maxTime) * 100
                 return (
-                  <div key={day} className={styles.weeklyBarCol}>
+                  <div key={day + i} className={styles.weeklyBarCol}>
                     <div className={styles.weeklyBarTrack}>
                       <div
                         className={`${styles.weeklyBarFill} ${isMax ? styles.weeklyBarToday : ''}`}
-                        style={{ height: `${heightPct}%` }}
+                        style={{ height: loading ? '0%' : `${heightPct}%` }}
                       />
                     </div>
                     <span className={`${styles.weeklyDayLabel} ${isMax ? styles.weeklyDayToday : ''}`}>
@@ -153,14 +207,16 @@ export default function DashboardPage() {
               })}
             </div>
             <div className={styles.weeklyTotal}>
-              이번 주 총 <strong>{totalHours}시간 {totalMins > 0 ? `${totalMins}분` : ''}</strong>
+              이번 주 총 <strong>{loading ? '-' : `${totalWeeklyHours}시간${totalWeeklyMins > 0 ? ` ${totalWeeklyMins}분` : ''}`}</strong>
             </div>
           </div>
         </div>
+
+        {/* 캠프 성장 */}
         <div className={styles.contentItem}>
           <h1 className={styles.contentTitle}>캠프 성장</h1>
           <div className={styles.milestoneList}>
-            {MILESTONES.map((m, i) => {
+            {milestones.map((m, i) => {
               const dotClass =
                 m.status === 'done'       ? styles.milestoneDotDone :
                 m.status === 'inProgress' ? styles.milestoneDotProgress :
@@ -174,19 +230,26 @@ export default function DashboardPage() {
                 m.status === 'inProgress' ? styles.milestoneDescProgress :
                 styles.milestoneDescLocked
 
+              const thresholdH = Math.floor(m.threshold / 60)
+              const desc = m.status === 'done'
+                ? '달성'
+                : m.status === 'inProgress'
+                ? `진행 중 ${m.progress}%`
+                : `${thresholdH}h~`
+
               return (
-                <div key={i} className={styles.milestoneItem}>
+                <div key={m.key} className={styles.milestoneItem}>
                   <div className={styles.milestoneLeft}>
                     <div className={`${styles.milestoneDot} ${dotClass}`}>
                       {m.status === 'done' && '✓'}
                     </div>
-                    {i < MILESTONES.length - 1 && <div className={styles.milestoneLine} />}
+                    {i < milestones.length - 1 && <div className={styles.milestoneLine} />}
                   </div>
                   <div className={styles.milestoneContent}>
                     <div className={styles.milestoneRow}>
                       <span className={styles.milestoneIcon}>{m.icon}</span>
                       <span className={`${styles.milestoneLabel} ${labelClass}`}>{m.label}</span>
-                      <span className={`${styles.milestoneDesc} ${descClass}`}>- {m.desc}</span>
+                      <span className={`${styles.milestoneDesc} ${descClass}`}>- {desc}</span>
                     </div>
                     {m.status === 'inProgress' && (
                       <div className={styles.milestoneProgressBar}>
@@ -200,6 +263,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
       <button className={styles.newSessionButton} onClick={handleStartSession}>
         {hasActiveSession ? '캠프로 돌아가기' : '집중 세션 시작하기'}
       </button>

@@ -4,6 +4,7 @@ import styles from './SessionPage.module.css'
 import { useTimerStore } from '../store/timerStore'
 import { useTimeOfDay } from '../hooks/useTimeOfDay'
 import { sessionAudio } from '../utils/sessionAudio'
+import { sessionsApi } from '../api/sessions'
 import Campfire from '../components/scene/Campfire'
 import SkyBody from '../components/scene/SkyBody'
 
@@ -23,19 +24,37 @@ const STARS = [
 export default function SessionPage() {
   const navigate = useNavigate()
   const { theme, prevTheme, fading } = useTimeOfDay()
-  const { isRunning, start, pause, resume, stop, getElapsedSeconds, totalSeconds } = useTimerStore()
+  const { isRunning, start, pause, resume, stop, getElapsedSeconds, totalSeconds, serverSessionId, setServerSessionId, pauseCount } = useTimerStore()
   const [, setTick] = useState(0)
+  const [todayMinutes, setTodayMinutes] = useState(0)
 
   useEffect(() => {
-    // 새 세션이면 시작 + 오디오 재생
-    if (!isRunning && getElapsedSeconds() === 0) {
-      start()
-      sessionAudio.play()
-    } else if (isRunning) {
-      // 돌아왔을 때 이미 진행 중이면 오디오 재생
-      sessionAudio.play()
+    sessionsApi.today().then(({ data }) => {
+      const total = data.reduce((sum, s) => sum + (s.duration ?? 0), 0)
+      setTodayMinutes(total)
+    }).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    const initSession = async () => {
+      if (!isRunning && getElapsedSeconds() === 0) {
+        start()
+        sessionAudio.play()
+        try {
+          const { data } = await sessionsApi.start()
+          setServerSessionId(data.id)
+        } catch {
+          // 이미 서버에 진행 중인 세션이 있으면 그 ID를 가져와 재사용
+          try {
+            const { data } = await sessionsApi.getActive()
+            if (data) setServerSessionId(data.id)
+          } catch {}
+        }
+      } else if (isRunning) {
+        sessionAudio.play()
+      }
     }
-    // 1초마다 재렌더링 — 언마운트 시 인터벌만 정리 (오디오는 유지)
+    initSession()
     const id = setInterval(() => setTick(t => t + 1), 1000)
     return () => clearInterval(id)
   }, [])
@@ -68,10 +87,20 @@ export default function SessionPage() {
   const seconds = elapsed % 60
   const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 
-  const handleEnd = () => {
+  const handleEnd = async () => {
+    const elapsed = Math.floor(getElapsedSeconds())
+    const focusScore = Math.max(0, Math.min(100, 100 - pauseCount * 10))
+
+    if (serverSessionId) {
+      try {
+        await sessionsApi.end(serverSessionId, focusScore, pauseCount)
+      } catch {
+        // 세션 종료 실패해도 타이머는 리셋
+      }
+    }
     stop()
     sessionAudio.stop()
-    navigate('/dashboard')
+    navigate('/dashboard', { state: { elapsed } })
   }
 
   return (
@@ -172,7 +201,7 @@ export default function SessionPage() {
           <div className={styles.timerDisplay}>
             <p className={styles.sessionLabel}>집중 세션 진행 중</p>
             <span className={styles.timerTime}>{timeStr}</span>
-            <p className={styles.accumulated}>오늘 누적 <strong>2시간 30분</strong></p>
+            <p className={styles.accumulated}>오늘 누적 <strong>{Math.floor(todayMinutes / 60) > 0 ? `${Math.floor(todayMinutes / 60)}시간 ` : ''}{todayMinutes % 60 > 0 ? `${todayMinutes % 60}분` : todayMinutes === 0 ? '0분' : ''}</strong></p>
           </div>
         </div>
 

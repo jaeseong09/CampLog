@@ -131,7 +131,7 @@ export default function LoginPage() {
         {/* 높이 애니메이션 컨테이너 */}
         <div
           className={styles.formAnimator}
-          style={{ height: formHeight !== undefined ? `${formHeight}px+20px` : 'auto' }}
+          style={{ height: formHeight !== undefined ? `calc(${formHeight}px + 20px)` : 'auto' }}
         >
           {/* 로그인 폼 */}
           <div

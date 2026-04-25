@@ -7,4 +7,9 @@ export default defineConfig({
   optimizeDeps: {
     include: ['lottie-react', 'lottie-web'],
   },
+  server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    },
+  },
 })
