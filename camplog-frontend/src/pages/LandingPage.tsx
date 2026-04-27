@@ -1,9 +1,15 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import styles from './LandingPage.module.css'
 import { useAuthStore } from '../store/authStore'
+import { campsiteApi } from '../api/campsite'
+import type { CampsiteResponse } from '../types'
 import Campfire from '../components/scene/Campfire'
 import Bear from '../components/scene/Bear'
 import SkyBody from '../components/scene/SkyBody'
+import Squirrel from '../components/scene/Squirrel'
+import PigeonNest from '../components/scene/PigeonNest'
+import ConstellationSign from '../components/scene/ConstellationSign'
 import { useTimeOfDay } from '../hooks/useTimeOfDay'
 
 const STARS = [
@@ -22,6 +28,18 @@ const STARS = [
 export default function LandingPage() {
   const { theme, prevTheme, fading } = useTimeOfDay()
   const { isAuthenticated } = useAuthStore()
+  const [campsite, setCampsite] = useState<CampsiteResponse | null>(null)
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      campsiteApi.get().then(r => setCampsite(r.data)).catch(() => {})
+    } else {
+      setCampsite(null)
+    }
+  }, [isAuthenticated])
+
+  const unlockedKeys = new Set(campsite?.unlockedItems.map(i => i.itemType) ?? [])
+  const has = (key: string) => unlockedKeys.has(key)
 
   return (
     <div className={styles.scene}>
@@ -86,30 +104,35 @@ export default function LandingPage() {
       {/* 돌 왼쪽 */}
       <img src="/stone.png" alt="" className={styles.stone} style={{ left: '8%', width: '140px' }} />
 
-      {/* 돌 오른쪽 + 랜턴 (같은 위치에 고정) */}
+      {/* 돌 오른쪽 + 랜턴 (랜턴은 해금 시에만) */}
       <div className={styles.stoneWithLantern}>
         <img src="/stone.png" alt="" className={styles.stoneInner} />
-        <div className={styles.lanternWrap}>
-          <div className={styles.lanternGlow} />
-          <img src="/lantern.png" alt="" className={styles.lanternImg} />
-        </div>
+        {has('lantern') && (
+          <div className={styles.lanternWrap}>
+            <div className={styles.lanternGlow} />
+            <img src="/lantern.png" alt="" className={styles.lanternImg} />
+          </div>
+        )}
       </div>
 
       {/* 불빛 glow */}
       <div className={styles.glow} />
 
-      {/* 곰 캐릭터 — 불 왼쪽 */}
-      <div style={{ position: 'absolute', bottom: '5px', left: 'calc(50% - 00px)', zIndex: 4 }}>
-        <Bear />
-      </div>
+      {has('bear') && (
+        <div style={{ position: 'absolute', bottom: '5px', left: 'calc(50% - 00px)', zIndex: 4 }}>
+          <Bear />
+        </div>
+      )}
 
       {/* 캠프파이어 */}
       <div className={styles.campfireWrap}>
         <Campfire />
       </div>
 
-      {/* 텐트 */}
-      <img src="/tent.png" alt="" className={styles.tent} />
+      {has('tent') && <img src="/tent.png" alt="" className={styles.tent} />}
+      {has('squirrel') && <div className={styles.squirrelWrap}><Squirrel /></div>}
+      {has('pigeon_nest') && <div className={styles.pigeonNestWrap}><PigeonNest /></div>}
+      {has('constellation') && <div className={styles.constellationWrap}><ConstellationSign /></div>}
 
       {/* 텍스트 */}
       <div className={styles.content}>

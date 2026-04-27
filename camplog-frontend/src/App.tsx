@@ -6,6 +6,8 @@ import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import SessionPage from './pages/SessionPage'
+import RankingPage from './pages/RankingPage'
+import ProfilePage from './pages/ProfilePage'
 import { useAuthStore } from './store/authStore'
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
@@ -38,6 +40,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/session" element={<ProtectedRoute><SessionPage /></ProtectedRoute>} />
+          <Route path="/ranking" element={<ProtectedRoute><RankingPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         </Routes>
       </main>
     </BrowserRouter>

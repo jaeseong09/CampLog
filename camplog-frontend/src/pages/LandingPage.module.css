@@ -225,6 +225,36 @@
   background-color: #e34d1f;
 }
 
+/* 다람쥐 */
+.squirrelWrap {
+  position: absolute;
+  bottom: 70px;
+  left: 16%;
+  z-index: 3;
+  transform: scale(0.9);
+  transform-origin: bottom left;
+}
+
+/* 별자리 표지판 */
+.constellationWrap {
+  position: absolute;
+  bottom: 75px;
+  right: 13%;
+  z-index: 4;
+  transform: scale(1.1);
+  transform-origin: bottom right;
+}
+
+/* 비둘기 둥지 */
+.pigeonNestWrap {
+  position: absolute;
+  bottom: 440px;
+  right: 3%;
+  z-index: 4;
+  transform: scale(0.6);
+  transform-origin: bottom right;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
   .title {

@@ -17,4 +17,7 @@ export const authApi = {
 
   googleLogin: (credential: string) =>
     client.post<AuthResponse>('/api/auth/google', { credential }),
+
+  updateProfile: (nickname: string) =>
+    client.patch<User>('/api/auth/profile', { nickname }),
 }

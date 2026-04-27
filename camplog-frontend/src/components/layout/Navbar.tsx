@@ -41,7 +41,8 @@ export default function Navbar() {
 
         {isAuthenticated ? (
           <>
-            <span className={styles.nickname}>{user?.nickname}</span>
+            <Link to="/ranking" className={styles.navLink}>랭킹</Link>
+            <Link to="/profile" className={styles.nickname}>{user?.nickname}</Link>
             <button className={styles.logoutBtn} onClick={handleLogout}>로그아웃</button>
           </>
         ) : (

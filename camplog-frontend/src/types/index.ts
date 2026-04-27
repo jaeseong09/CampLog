@@ -45,3 +45,11 @@ export interface CampsiteResponse {
   nextUnlockMinutes: number | null
   unlockedItems: CampsiteItemResponse[]
 }
+
+export interface RankingEntry {
+  rank: number
+  userId: number
+  nickname: string
+  avatarType: string | null
+  studyMinutes: number
+}

@@ -1,0 +1,268 @@
+/* ── 전체 페이지 ── */
+.page {
+  position: relative;
+  min-height: 100vh;
+  color: #fff;
+}
+
+.bgLayer {
+  position: fixed;
+  inset: 0;
+  transition: opacity 3s ease-in-out;
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 2.5% 7.5%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pageTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* ── 요약 2열 카드 ── */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.summaryCard {
+  background: #1B1B1B;
+  border: 2px solid #C9C9C9;
+  border-radius: 20px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summaryLabel {
+  font-size: 0.8rem;
+  color: #5A5A5A;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.summaryValue {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #fff;
+  margin: 4px 0 2px;
+}
+
+.summaryMeta {
+  font-size: 0.8rem;
+  color: #5A5A5A;
+}
+
+.summaryChange {
+  font-size: 0.82rem;
+  color: #E85D24;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* ── 랭킹 카드 ── */
+.rankCard {
+  background: #1B1B1B;
+  border: 2px solid #C9C9C9;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* 세그먼트 탭 */
+.segmentWrap {
+  padding: 16px 20px 0;
+}
+
+.segment {
+  display: inline-flex;
+  background: #111;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.segBtn {
+  padding: 7px 20px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #5A5A5A;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.segBtn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.segBtnActive {
+  background: #0e0e0e;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 내 순위 고정 박스 */
+.myPinnedBox {
+  margin: 14px 16px 0;
+  border: 1.5px solid #E85D24;
+  border-radius: 12px;
+  background: rgba(232, 93, 36, 0.08);
+  overflow: hidden;
+}
+
+.myPinnedBox .row {
+  border-bottom: none;
+}
+
+/* ── 목록 ── */
+.list {
+  margin-top: 8px;
+}
+
+/* 행 */
+.row {
+  display: grid;
+  grid-template-columns: 44px 44px 1fr 110px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.15s;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.rowMe {
+  background: rgba(232, 93, 36, 0.04);
+}
+
+/* 순위 번호 */
+.rankCol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rankNum {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.rankDefault { color: #5A5A5A; }
+.rank1 { color: #f5c842; }
+.rank2 { color: #aabac8; }
+.rank3 { color: #c87d3e; }
+
+/* 아바타 */
+.avatarCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+
+.avatarMe {
+  border-color: #E85D24;
+}
+
+/* 이름 + 캠프사이트 */
+.nameCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nickname {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meTag {
+  font-size: 0.75rem;
+  color: #E85D24;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.campsiteLabel {
+  font-size: 0.72rem;
+  color: #5A5A5A;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 시간 + 진행바 */
+.timeCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.timeText {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.bar {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: #E85D24;
+  border-radius: 1px;
+  transition: width 0.5s ease;
+}
+
+/* 빈 상태 */
+.empty {
+  padding: 48px;
+  text-align: center;
+  color: #5A5A5A;
+  font-size: 0.9rem;
+}

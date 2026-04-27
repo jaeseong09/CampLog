@@ -39,7 +39,11 @@ export default function SessionPage() {
     const initSession = async () => {
       if (!isRunning && getElapsedSeconds() === 0) {
         start()
-        sessionAudio.play()
+      }
+      sessionAudio.play()
+
+      // serverSessionId가 없으면 항상 백엔드 세션 시작/복구 시도
+      if (!serverSessionId) {
         try {
           const { data } = await sessionsApi.start()
           setServerSessionId(data.id)
@@ -50,8 +54,6 @@ export default function SessionPage() {
             if (data) setServerSessionId(data.id)
           } catch {}
         }
-      } else if (isRunning) {
-        sessionAudio.play()
       }
     }
     initSession()
@@ -90,17 +92,19 @@ export default function SessionPage() {
   const handleEnd = async () => {
     const elapsed = Math.floor(getElapsedSeconds())
     const focusScore = Math.max(0, Math.min(100, 100 - pauseCount * 10))
+    let newlyUnlocked: string[] = []
 
     if (serverSessionId) {
       try {
-        await sessionsApi.end(serverSessionId, focusScore, pauseCount)
+        const { data } = await sessionsApi.end(serverSessionId, focusScore, pauseCount)
+        newlyUnlocked = data.newlyUnlockedItems ?? []
       } catch {
         // 세션 종료 실패해도 타이머는 리셋
       }
     }
     stop()
     sessionAudio.stop()
-    navigate('/dashboard', { state: { elapsed } })
+    navigate('/dashboard', { state: { elapsed, newlyUnlocked } })
   }
 
   return (
@@ -143,11 +147,14 @@ export default function SessionPage() {
       <img src={theme.treeImage} alt="" className={styles.tree} style={{ right: '60px', height: '500px', opacity: 0.85 }} />
       <img src="/bigTree.png"    alt="" className={styles.tree} style={{ right: '100px',   height: '48em' }} />
 
-      <div className={styles.glow} />
+      <div className={styles.glow} style={{
+        opacity: 0.3 + (Math.max(0, Math.min(100, 100 - pauseCount * 10)) / 100) * 0.7,
+        transition: 'opacity 2s ease',
+      }} />
 
       {/* 캠프파이어 */}
       <div className={styles.campfireWrap}>
-        <Campfire />
+        <Campfire intensity={Math.max(0, Math.min(100, 100 - pauseCount * 10))} />
       </div>
 
       <div className={styles.footer} />

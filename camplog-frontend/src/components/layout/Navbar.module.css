@@ -45,6 +45,12 @@
 .nickname {
   color: rgba(255, 255, 255, 0.8);
   font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nickname:hover {
+  color: #fff;
 }
 
 .logoutBtn {
@@ -60,6 +66,17 @@
 
 .logoutBtn:hover {
   background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.navLink:hover {
   color: rgba(255, 255, 255, 0.9);
 }
 

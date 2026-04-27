@@ -10,15 +10,20 @@ import type { CampsiteResponse, SessionResponse } from '../types'
 import SkyBody from '../components/scene/SkyBody'
 import Campfire from '../components/scene/Campfire'
 import Bear from '../components/scene/Bear'
+import Squirrel from '../components/scene/Squirrel'
+import PigeonNest from '../components/scene/PigeonNest'
+import ConstellationSign from '../components/scene/ConstellationSign'
+import UnlockModal from '../components/UnlockModal'
 
 const DAYS_LABEL = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 const MILESTONE_CONFIG = [
-  { key: 'tent',          icon: '⛺', label: '텐트',          threshold: 60  },
-  { key: 'lantern',       icon: '🏮', label: '랜턴',          threshold: 180 },
-  { key: 'squirrel',      icon: '🐿️', label: '다람쥐',        threshold: 300 },
-  { key: 'pigeon_nest',   icon: '🕊️', label: '비둘기 둥지',   threshold: 480 },
-  { key: 'constellation', icon: '✨', label: '별자리 표지판', threshold: 900 },
+  { key: 'bear',          icon: '🐻', label: '곰',            threshold: 90  },
+  { key: 'tent',          icon: '⛺', label: '텐트',          threshold: 120 },
+  { key: 'lantern',       icon: '🏮', label: '랜턴',          threshold: 240 },
+  { key: 'squirrel',      icon: '🐿️', label: '다람쥐',        threshold: 360 },
+  { key: 'pigeon_nest',   icon: '🕊️', label: '비둘기 둥지',   threshold: 540 },
+  { key: 'constellation', icon: '✨', label: '별자리 표지판', threshold: 960 },
 ]
 
 const STARS = [
@@ -64,6 +69,7 @@ export default function DashboardPage() {
   const [todaySessions, setTodaySessions] = useState<SessionResponse[]>([])
   const [weeklySessions, setWeeklySessions] = useState<SessionResponse[]>([])
   const [loading, setLoading] = useState(true)
+  const [unlockedItems, setUnlockedItems] = useState<string[]>([])
 
   useEffect(() => {
     setLoading(true)
@@ -78,6 +84,13 @@ export default function DashboardPage() {
     }).catch((err) => {
       console.error('Dashboard fetch error:', err?.response?.status, err?.response?.data || err?.message)
     }).finally(() => setLoading(false))
+
+    // 세션 종료 후 넘어온 해금 아이템
+    const state = location.state as { newlyUnlocked?: string[] } | null
+    if (state?.newlyUnlocked && state.newlyUnlocked.length > 0) {
+      setUnlockedItems(state.newlyUnlocked)
+      window.history.replaceState({}, '')  // state 소비
+    }
   }, [location.key])
 
   const hasActiveSession = isRunning || getElapsedSeconds() > 0
@@ -108,6 +121,7 @@ export default function DashboardPage() {
   // 캠프 성장 마일스톤
   const totalStudyTime = campsite?.totalStudyTime ?? user?.totalStudyTime ?? 0
   const unlockedKeys = new Set(campsite?.unlockedItems.map((i) => i.itemType) ?? [])
+  const has = (key: string) => unlockedKeys.has(key)
   const milestones = MILESTONE_CONFIG.map((m) => {
     const done = unlockedKeys.has(m.key)
     const inProgress = !done && totalStudyTime > 0 && totalStudyTime < m.threshold
@@ -117,6 +131,7 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.dashboard} style={{ background: theme.sky }}>
+      <UnlockModal items={unlockedItems} onClose={() => setUnlockedItems([])} />
       <div className={styles.header}>
         {prevTheme && (
           <div className={styles.headerSkyLayer} style={{ background: prevTheme.sky, opacity: fading ? 0 : 1 }} />
@@ -146,16 +161,23 @@ export default function DashboardPage() {
           <img src={theme.treeImage} alt="" className={styles.headerTree} style={{ right: '230px', height: '130px', opacity: 0.65 }} />
 
           <img src="/stone.png" alt="" className={styles.stone} />
-          <div className={styles.stoneWithLantern}>
-            <img src="/stone.png" alt="" className={styles.stoneInner} />
-            <div className={styles.lanternWrap}>
-              <div className={styles.lanternGlow} />
-              <img src="/lantern.png" alt="" className={styles.lanternImg} />
-            </div>
-          </div>
 
-          <img src="/tent.png" alt="" className={styles.tent} />
-          <div className={styles.bearWrap}><Bear /></div>
+          {has('lantern') && (
+            <div className={styles.stoneWithLantern}>
+              <img src="/stone.png" alt="" className={styles.stoneInner} />
+              <div className={styles.lanternWrap}>
+                <div className={styles.lanternGlow} />
+                <img src="/lantern.png" alt="" className={styles.lanternImg} />
+              </div>
+            </div>
+          )}
+
+          {has('tent') && <img src="/tent.png" alt="" className={styles.tent} />}
+          {has('squirrel') && <div className={styles.squirrelWrap}><Squirrel /></div>}
+          {has('pigeon_nest') && <div className={styles.pigeonNestWrap}><PigeonNest /></div>}
+          {has('constellation') && <div className={styles.constellationWrap}><ConstellationSign /></div>}
+
+          {has('bear') && <div className={styles.bearWrap}><Bear /></div>}
           <div className={styles.campfireWrap}><Campfire /></div>
           <div className={styles.glow} />
         </div>

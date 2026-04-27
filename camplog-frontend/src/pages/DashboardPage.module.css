@@ -381,6 +381,33 @@
   z-index: 5;
 }
 
+.squirrelWrap {
+  position: absolute;
+  bottom: 70px;
+  left: 28%;
+  z-index: 4;
+  transform: scale(0.6);
+  transform-origin: bottom left;
+}
+
+.pigeonNestWrap {
+  position: absolute;
+  bottom: 235px;
+  right: 0px;
+  z-index: 6;
+  transform: scale(0.5);
+  transform-origin: bottom right;
+}
+
+.constellationWrap {
+  position: absolute;
+  bottom: 72px;
+  right: 13%;
+  z-index: 6;
+  transform: scale(0.65);
+  transform-origin: bottom right;
+}
+
 .campfireWrap{
   position: absolute;
   bottom: 75px;

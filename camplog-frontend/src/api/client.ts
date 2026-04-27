@@ -13,6 +13,9 @@ client.interceptors.request.use((config) => {
   return config
 })
 
+// 동시에 여러 401이 와도 refresh는 한 번만 호출
+let refreshPromise: Promise<AuthResponse> | null = null
+
 client.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -20,23 +23,32 @@ client.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true
       const refreshToken = localStorage.getItem('refreshToken')
-      if (refreshToken) {
-        try {
-          const { data } = await axios.post<AuthResponse>(
-            `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/auth/refresh`,
-            { refreshToken }
-          )
-          localStorage.setItem('token', data.token)
-          localStorage.setItem('refreshToken', data.refreshToken)
-          original.headers.Authorization = `Bearer ${data.token}`
-          return client(original)
-        } catch {
-          localStorage.removeItem('token')
-          localStorage.removeItem('refreshToken')
-          window.location.href = '/login'
-        }
-      } else {
+      if (!refreshToken) {
         window.location.href = '/login'
+        return Promise.reject(error)
+      }
+
+      try {
+        if (!refreshPromise) {
+          refreshPromise = axios
+            .post<AuthResponse>(
+              `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/auth/refresh`,
+              { refreshToken }
+            )
+            .then(res => res.data)
+            .finally(() => { refreshPromise = null })
+        }
+
+        const data = await refreshPromise
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('refreshToken', data.refreshToken)
+        original.headers.Authorization = `Bearer ${data.token}`
+        return client(original)
+      } catch {
+        localStorage.removeItem('token')
+        localStorage.removeItem('refreshToken')
+        window.location.href = '/login'
+        return Promise.reject(error)
       }
     }
     return Promise.reject(error)
